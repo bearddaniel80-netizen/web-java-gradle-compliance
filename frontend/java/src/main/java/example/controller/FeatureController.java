@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequestMapping("/feature") // Base URL path for all endpoints in this c
 public class FeatureController {
 
-  private final String FOLDER = "feature";
+  private final static String FOLDER = "feature";
 
   @GetMapping("/cache")
   public String cache() {

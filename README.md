@@ -161,13 +161,13 @@ docker volume prune && docker system prune
 Reverse proxy with additional rate limit plugin. Manages self-signed ssl certificates.
 
 ### FastAPI
-A python based api only gateway protected by docker secrets file. Being python based, can use `subprocess` function to make external calls to AQL platform applications.
+A Java Spring REST api only gateway protected by docker secrets file.
 
 ### Frontend
 A Java / React simple page that displays api data.
 
-### Node
-A nodejs express BFF (backend for frontend) gateway protected by docker secrets file.
+### BFF
+A Java BFF (backend for frontend) gateway protected by docker secrets file.
 
 ### Playwrite
 Tests browser and api.

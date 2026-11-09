@@ -4,16 +4,13 @@ FROM python:3.12-slim AS deps
 
 WORKDIR /build
 
-COPY requirements.txt .
-
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
     --prefix=/install \
-    -r requirements.txt
+    build rich typer
+
 # ---------- Common Git Stage ----------
 FROM deps AS git-base
-
-COPY --from=deps /install /usr/local
 
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && \
@@ -74,37 +71,27 @@ RUN cp -R /downloads/compliance-public/data/* .
 
 RUN cp /downloads/compliance-public/README.md .
 
-# ----------- runtime ------
+# ---------- Java runtime ----------
+FROM gradle:jdk21 AS runtime
 
-FROM deps AS runtime
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && \
+    apt-get install -y python3 python3-venv pandoc poppler-utils
 
-COPY --from=deps /install /usr/local
-
-COPY --from=link /tmp/*.whl /tmp
-RUN pip install /tmp/*.whl
-
-COPY --from=aql /tmp/*.whl /tmp
-RUN pip install /tmp/*.whl
-
-COPY --from=compliance /tmp/*.whl /tmp
-RUN pip install /tmp/*.whl
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 
-COPY --from=aql /app .
+COPY --from=link /tmp/*.whl /tmp/
+COPY --from=aql /tmp/*.whl /tmp/
+COPY --from=compliance /tmp/*.whl /tmp/
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install /tmp/*.whl
 
+COPY --from=aql /app .
 COPY --from=compliance /app .
 
-# Linux tool md2html
-RUN --mount=type=cache,target=/var/cache/apt \
-    apt-get update && \
-    apt-get install -y pandoc
+COPY --chown=gradle:gradle java/ ./
 
-# Linux tool pdf2html
-RUN --mount=type=cache,target=/var/cache/apt \
-    apt-get update && \
-    apt-get install -y pdftohtml
-
-COPY . .
-
-CMD [  "uvicorn",  "app.main:app",  "--host",  "0.0.0.0",  "--port",  "8000"]
+CMD ["gradle", "bootRun"]

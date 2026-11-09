@@ -51,24 +51,24 @@ services:
       target: ${TARGET}
 
   # ==========================================================
-  # NODE.JS BFF
+  # BFF
   #
-  # Browser -> Node -> FastAPI
+  # Browser -> BFF -> FastAPI
   # or
-  # Browser -> Node -> MiniO -> FastAPI
+  # Browser -> BFF -> MiniO -> FastAPI
   #
-  # Node is NOT publicly exposed.
+  # BFF is NOT publicly exposed.
   # ==========================================================
 
-  node:
+  bff:
     <<: *secrets-default
     build:
-      context: ./node
+      context: ./bff
       target: ${TARGET}
 
     environment:
-      NODE_ENV: ${ENVIRONMENT}
-      FASTAPI_URL: http://fastapi:8000
+      BFF_ENV: ${ENVIRONMENT}
+      FASTAPI_URL: http://fastapi:8080
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
       MINIO_BUCKET: ${MINIO_BUCKET}
 
@@ -203,11 +203,11 @@ services:
 networks:
 
   # Caddy <-> React
-  # Caddy <-> Node
+  # Caddy <-> BFF
   public:
 
-  # Node <-> FastAPI
-  # Node <-> MiniO
+  # BFF <-> FastAPI
+  # BFF <-> MiniO
   # FastAPI <-> MiniO
   backend:
 
