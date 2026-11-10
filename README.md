@@ -1,7 +1,8 @@
-# web-java-compliance
+# web-java-gradle-compliance
 
 ## Description
 A secured api/frontend for the AQL platform.
+
 Features
 - unit tests
 - profile tests
